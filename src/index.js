@@ -12,7 +12,7 @@ class ScrollHeaderPanel extends HTMLElement {
     // XXX: gradation optionほしい
 
     this.lastScrollTop = 0
-    this.lastScrollDirection = 'down'
+    this.lastScrollDirection = ''
     this.render()
   }
 
@@ -50,20 +50,20 @@ class ScrollHeaderPanel extends HTMLElement {
         .header-icon {
           width: 40px;
           height: 40px;
-          top: 12px;
+          margin-top: 12px;
           left: 18px;
-          position: fixed;
+          position: absolute;
           background-size: cover;
           z-index: 20;
           cursor: pointer;
           background-color: rgba(0, 0, 0, 0);
           background-image: url(${this.iconSrcUrl});
         }
-        .header-slot {
-          position: fixed;
+        .header-menu {
+          position: absolute;
           z-index: 20;
           height: 40px;
-          top: 12px;
+          margin-top: 12px;
           right: 10px;
           user-select: none;
           -webkit-user-select: none;
@@ -118,8 +118,8 @@ class ScrollHeaderPanel extends HTMLElement {
         <div class='header'></div>
         <div class='header-color-panel'></div>
         <div class='header-icon'></div>
-        <div class='header-slot'>
-          <slot name='header'></slot>
+        <div class='header-menu'>
+          <slot name='header-menu'></slot>
         </div>
         <div class='title'>
           <div class='t'>ScrollHeaderPanel</div>
@@ -137,32 +137,52 @@ class ScrollHeaderPanel extends HTMLElement {
     for (const key of keys) dom.style[key] = `${css[key]}`
   }
 
-  onScroll () {
-    const titleBar = this.shadowRoot.querySelector('.title')
-    const headerColorPanel = this.shadowRoot.querySelector('.header-color-panel')
-
+  directiveSticky ({titleBar, icon, menu}) {
     const y = window.scrollY
     const direction = y > this.lastScrollTop ? 'down' : 'up'
-
     if (y >= this.headerHeight - titleBar.offsetHeight) {
       if (direction === 'down') {
         this.applyStyle(titleBar, {
           position: 'absolute'
         })
+        if (y < this.headerHeight) {
+          const style = {
+            position: 'absolute',
+            top: `${this.solid ? y : Math.min(y, this.headerHeight - this.titleHeight)}px`
+          }
+          this.applyStyle(icon, style)
+          this.applyStyle(menu, style)
+        }
       } else {
         const style = {}
         if (this.lastScrollDirection !== 'up') {
           style.top = `${y - this.titleHeight}px`
-          console.log(y, pageYOffset, this.titleHeight)
         } else if (y - +titleBar.style.top.replace('px', '') < 0) {
           style.top = `${y}px`
         }
         this.applyStyle(titleBar, style)
+        this.applyStyle(icon, style)
+        this.applyStyle(menu, style)
       }
+    } else {
+      const style = {
+        position: 'fixed',
+        top: 0
+      }
+      this.applyStyle(icon, style)
+      this.applyStyle(menu, style)
     }
     this.lastScrollTop = y
     this.lastScrollDirection = direction
+  }
 
+  onScroll () {
+    const titleBar = this.shadowRoot.querySelector('.title')
+    const icon = this.shadowRoot.querySelector('.header-icon')
+    const menu = this.shadowRoot.querySelector('.header-menu')
+    const headerColorPanel = this.shadowRoot.querySelector('.header-color-panel')
+
+    this.directiveSticky({titleBar, icon, menu})
     if (!this.solid) {
       this.behaviorDefault({titleBar, headerColorPanel})
     } else {
@@ -184,12 +204,10 @@ class ScrollHeaderPanel extends HTMLElement {
         opacity: y / headerHeight
       })
     } else {
-      // this.applyStyle(titleBar, {
-      //   position: 'fixed',
-      //   top: 0,
-      //   opacity: 1,
-      //   backgroundColor: this.panelColor
-      // })
+      this.applyStyle(titleBar, {
+        opacity: 1,
+        backgroundColor: this.panelColor
+      })
     }
 
     const d = Math.min(1, y / headerHeight) * 0.25
@@ -211,11 +229,6 @@ class ScrollHeaderPanel extends HTMLElement {
       this.applyStyle(headerColorPanel, {
         opacity: y / headerHeight // 0
       })
-    } else {
-      // this.applyStyle(titleBar, {
-      //   position: 'fixed',
-      //   top: 0
-      // })
     }
     this.applyStyle(title, {
       transform: `scale(0.75) translateZ(0px)`

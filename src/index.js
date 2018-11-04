@@ -93,7 +93,7 @@ class ScrollHeaderPanel extends HTMLElement {
           height: ${this.titleHeight}px;
         }
         .t {
-          transform: scale(0.75) translateZ(0px);
+          /* transform: scale(0.75) translateZ(0px); */
           transform-origin: 0;
           /* margin-top: 8px; */
           padding-top: 10px;
@@ -140,38 +140,31 @@ class ScrollHeaderPanel extends HTMLElement {
   directiveSticky ({titleBar, icon, menu}) {
     const y = window.scrollY
     const direction = y > this.lastScrollTop ? 'down' : 'up'
-    if (y >= this.headerHeight - titleBar.offsetHeight) {
-      if (direction === 'down') {
-        this.applyStyle(titleBar, {
-          position: 'absolute'
-        })
-        if (y < this.headerHeight) {
-          const style = {
-            position: 'absolute',
-            top: `${this.solid ? y : Math.min(y, this.headerHeight - this.titleHeight)}px`
-          }
-          this.applyStyle(icon, style)
-          this.applyStyle(menu, style)
+
+    if (direction === 'down') {
+      this.applyStyle(titleBar, {
+        position: 'absolute'
+      })
+      if (y < this.headerHeight) {
+        const style = {
+          position: 'absolute',
+          top: `${this.solid ? y : Math.min(y, this.headerHeight - this.titleHeight)}px`
         }
-      } else {
-        const style = {}
-        if (this.lastScrollDirection !== 'up') {
-          style.top = `${y - this.titleHeight}px`
-        } else if (y - +titleBar.style.top.replace('px', '') < 0) {
-          style.top = `${y}px`
-        }
-        this.applyStyle(titleBar, style)
         this.applyStyle(icon, style)
         this.applyStyle(menu, style)
       }
     } else {
-      const style = {
-        position: 'fixed',
-        top: 0
+      const style = {}
+      if (this.lastScrollDirection !== 'up') {
+        style.top = `${y - this.titleHeight}px`
+      } else if (y - +titleBar.style.top.replace('px', '') < 0) {
+        style.top = `${y}px`
       }
+      this.applyStyle(titleBar, style)
       this.applyStyle(icon, style)
       this.applyStyle(menu, style)
     }
+
     this.lastScrollTop = y
     this.lastScrollDirection = direction
   }

@@ -148,7 +148,6 @@ class ScrollHeaderPanel extends HTMLElement {
     const y = window.scrollY
     const headerHeight = this.headerHeight
     const title = titleBar.querySelector('.t')
-    const d = Math.min(1, y / headerHeight) * 0.25
     if (y < headerHeight - titleBar.offsetHeight) {
       this.applyStyle(titleBar, {
         position: 'absolute',
@@ -166,6 +165,8 @@ class ScrollHeaderPanel extends HTMLElement {
         backgroundColor: this.panelColor
       })
     }
+
+    const d = Math.min(1, y / headerHeight) * 0.25
     this.applyStyle(title, {
       transform: `scale(${1 - d}) translateZ(0px)`
     })

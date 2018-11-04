@@ -27,6 +27,7 @@ class ScrollHeaderPanel extends HTMLElement {
         .whole {
           width: 100%;
           height: 100vh;
+          overflow-y: hidden;
         }
         .header {
           background: #eee;
@@ -55,6 +56,8 @@ class ScrollHeaderPanel extends HTMLElement {
           height: 40px;
           top: 12px;
           right: 10px;
+          user-select: none;
+          -webkit-user-select: none;
         }
         .header-color-panel {
           position: absolute;
@@ -67,11 +70,14 @@ class ScrollHeaderPanel extends HTMLElement {
         }
         .title {
           position: absolute;
+          box-sizing: border-box;
           padding-left: 20px;
           bottom: 0;
           font-size: 40px;
-          width: 100vw;
+          width: 100%;
           z-index: 10;
+          user-select: none;
+          -webkit-user-select: none;
           background: ${this.solid ? this.panelColor : 'transparent'};
           color: ${this.titleColor};
           top: ${this.solid ? this.headerHeight : this.headerHeight - this.titleHeight}px;
@@ -132,7 +138,7 @@ class ScrollHeaderPanel extends HTMLElement {
     if (!this.solid) {
       this.behaviorDefault({titleBar, header, headerColorPanel})
     } else {
-      this.behaviorSolid({titleBar, header, headerColorPanel})
+      this.behaviorSolid({titleBar, header})
     }
   }
 
@@ -158,7 +164,7 @@ class ScrollHeaderPanel extends HTMLElement {
     }
   }
 
-  behaviorSolid ({titleBar, header, headerColorPanel}) {
+  behaviorSolid ({titleBar, header}) {
     const y = window.scrollY
     const headerHeight = header.offsetHeight
     if (y < headerHeight) {
@@ -175,7 +181,8 @@ class ScrollHeaderPanel extends HTMLElement {
   }
 
   render () {
-    const shadowRoot = this.shadowRoot || this.attachShadow({mode: 'open'})
+    const shadowRoot = this.shadowRoot || this.attachShadow({ mode: 'open' })
+    shadowRoot.textContent = null
     shadowRoot.appendChild(this.template.content.cloneNode(true))
     window.addEventListener('scroll', this.onScroll.bind(this))
   }

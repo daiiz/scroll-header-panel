@@ -147,6 +147,7 @@ class ScrollHeaderPanel extends HTMLElement {
   behaviorDefault ({titleBar, headerColorPanel}) {
     const y = window.scrollY
     const headerHeight = this.headerHeight
+    const title = titleBar.querySelector('.t')
     if (y < headerHeight - titleBar.offsetHeight) {
       this.applyStyle(titleBar, {
         position: 'absolute',
@@ -164,11 +165,17 @@ class ScrollHeaderPanel extends HTMLElement {
         backgroundColor: this.panelColor
       })
     }
+
+    const d = Math.min(1, y / headerHeight) * 0.25
+    this.applyStyle(title, {
+      transform: `scale(${1 - d}) translateZ(0px)`
+    })
   }
 
   behaviorSolid ({titleBar, headerColorPanel}) {
     const y = window.scrollY
     const headerHeight = this.headerHeight
+    const title = titleBar.querySelector('.t')
     if (y < headerHeight) {
       this.applyStyle(titleBar, {
         position: 'absolute',
@@ -176,7 +183,7 @@ class ScrollHeaderPanel extends HTMLElement {
         top: `${headerHeight}px`,
       })
       this.applyStyle(headerColorPanel, {
-        opacity: 0 //y / headerHeight
+        opacity: y / headerHeight // 0
       })
     } else {
       this.applyStyle(titleBar, {
@@ -184,6 +191,9 @@ class ScrollHeaderPanel extends HTMLElement {
         top: 0
       })
     }
+    this.applyStyle(title, {
+      transform: `scale(0.75) translateZ(0px)`
+    })
   }
 
   renderStyle () {

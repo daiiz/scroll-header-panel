@@ -4,11 +4,19 @@ class ScrollHeaderPanel extends HTMLElement {
     this.panelColor = `#312319`
     this.titleColor = `rgb(234, 223, 198)`
     this.bodyColor = `#e9e7e4`
-    this.solid = true
     this.headerHeight = 192
     this.titleHeight = 64
     this.iconSrcUrl = `./miilclient.png`
     this.panelSrcUrl = `./miilclient.bg.jpg`
+    this.solid = false
+    this.render()
+  }
+
+  static get is () { return 'scroll-header-panel' }
+  static get observedAttributes () { return ['solid'] }
+
+  attributeChangedCallback () {
+    this.solid = this.getAttribute('solid') !== null
     this.render()
   }
 
@@ -64,7 +72,7 @@ class ScrollHeaderPanel extends HTMLElement {
           font-size: 40px;
           width: 100vw;
           z-index: 10;
-          background: ${this.solid ? this.panelColor : transparent};
+          background: ${this.solid ? this.panelColor : 'transparent'};
           color: ${this.titleColor};
           top: ${this.solid ? this.headerHeight : this.headerHeight - this.titleHeight}px;
           height: ${this.titleHeight}px;
@@ -79,9 +87,8 @@ class ScrollHeaderPanel extends HTMLElement {
         .body {
           position: absolute;
           width: 100%;
-          background: ${this.bodyColor};
           top: ${this.solid ? this.headerHeight + this.titleHeight : this.headerHeight}px;
-          /* height: calc(100% - 192px); */
+          background: ${this.bodyColor};
         }
       </style>
     `
@@ -110,10 +117,6 @@ class ScrollHeaderPanel extends HTMLElement {
       </div>
     `
     return t
-  }
-
-  static get is () {
-    return 'scroll-header-panel'
   }
 
   applyStyle (dom, css) {
@@ -172,7 +175,7 @@ class ScrollHeaderPanel extends HTMLElement {
   }
 
   render () {
-    const shadowRoot = this.attachShadow({mode: 'open'})
+    const shadowRoot = this.shadowRoot || this.attachShadow({mode: 'open'})
     shadowRoot.appendChild(this.template.content.cloneNode(true))
     window.addEventListener('scroll', this.onScroll.bind(this))
   }

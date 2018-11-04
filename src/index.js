@@ -9,15 +9,21 @@ class ScrollHeaderPanel extends HTMLElement {
     this.iconSrcUrl = `./miilclient.png`
     this.panelSrcUrl = `./miilclient.bg.jpg`
     this.solid = false
+    // XXX: gradation optionほしい
     this.render()
   }
 
   static get is () { return 'scroll-header-panel' }
   static get observedAttributes () { return ['solid'] }
 
-  attributeChangedCallback () {
-    this.solid = this.getAttribute('solid') !== null
-    this.renderStyle()
+  attributeChangedCallback (attr, oldVal, newVal) {
+    switch (attr) {
+      case 'solid': {
+        this.solid = newVal === ''
+        this.renderStyle()
+        this.onScroll()
+      }
+    }
   }
 
   get style () {
@@ -129,19 +135,18 @@ class ScrollHeaderPanel extends HTMLElement {
 
   onScroll () {
     const titleBar = this.shadowRoot.querySelector('.title')
-    const header = this.shadowRoot.querySelector('.header')
     const headerColorPanel = this.shadowRoot.querySelector('.header-color-panel')
 
     if (!this.solid) {
-      this.behaviorDefault({titleBar, header, headerColorPanel})
+      this.behaviorDefault({titleBar, headerColorPanel})
     } else {
-      this.behaviorSolid({titleBar, header})
+      this.behaviorSolid({titleBar, headerColorPanel})
     }
   }
 
-  behaviorDefault ({titleBar, header, headerColorPanel}) {
+  behaviorDefault ({titleBar, headerColorPanel}) {
     const y = window.scrollY
-    const headerHeight = header.offsetHeight
+    const headerHeight = this.headerHeight
     if (y < headerHeight - titleBar.offsetHeight) {
       this.applyStyle(titleBar, {
         position: 'absolute',
@@ -161,13 +166,17 @@ class ScrollHeaderPanel extends HTMLElement {
     }
   }
 
-  behaviorSolid ({titleBar, header}) {
+  behaviorSolid ({titleBar, headerColorPanel}) {
     const y = window.scrollY
-    const headerHeight = header.offsetHeight
+    const headerHeight = this.headerHeight
     if (y < headerHeight) {
       this.applyStyle(titleBar, {
         position: 'absolute',
+        backgroundColor: this.panelColor,
         top: `${headerHeight}px`,
+      })
+      this.applyStyle(headerColorPanel, {
+        opacity: 0 //y / headerHeight
       })
     } else {
       this.applyStyle(titleBar, {
@@ -188,7 +197,13 @@ class ScrollHeaderPanel extends HTMLElement {
     const shadowRoot = this.attachShadow({mode: 'open'})
     this.renderStyle()
     shadowRoot.appendChild(this.template.content.cloneNode(true))
-    window.addEventListener('scroll', this.onScroll.bind(this))
+    window.addEventListener('scroll', this.onScroll.bind(this), false)
+
+    const icon = shadowRoot.querySelector('.header-icon')
+    icon.addEventListener('click', () => {
+      const event = new Event('icon-click')
+      this.dispatchEvent(event)
+    }, false)
   }
 }
 

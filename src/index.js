@@ -10,6 +10,9 @@ class ScrollHeaderPanel extends HTMLElement {
     this.panelSrcUrl = `./miilclient.bg.jpg`
     this.solid = false
     // XXX: gradation optionほしい
+
+    this.lastScrollTop = 0
+    this.lastScrollDirection = 'down'
     this.render()
   }
 
@@ -92,7 +95,8 @@ class ScrollHeaderPanel extends HTMLElement {
         .t {
           transform: scale(0.75) translateZ(0px);
           transform-origin: 0;
-          margin-top: 8px;
+          /* margin-top: 8px; */
+          padding-top: 10px;
           margin-left: 50px;
           font-family: 'roboto';
         }
@@ -137,6 +141,28 @@ class ScrollHeaderPanel extends HTMLElement {
     const titleBar = this.shadowRoot.querySelector('.title')
     const headerColorPanel = this.shadowRoot.querySelector('.header-color-panel')
 
+    const y = window.scrollY
+    const direction = y > this.lastScrollTop ? 'down' : 'up'
+
+    if (y >= this.headerHeight - titleBar.offsetHeight) {
+      if (direction === 'down') {
+        this.applyStyle(titleBar, {
+          position: 'absolute'
+        })
+      } else {
+        const style = {}
+        if (this.lastScrollDirection !== 'up') {
+          style.top = `${y - this.titleHeight}px`
+          console.log(y, pageYOffset, this.titleHeight)
+        } else if (y - +titleBar.style.top.replace('px', '') < 0) {
+          style.top = `${y}px`
+        }
+        this.applyStyle(titleBar, style)
+      }
+    }
+    this.lastScrollTop = y
+    this.lastScrollDirection = direction
+
     if (!this.solid) {
       this.behaviorDefault({titleBar, headerColorPanel})
     } else {
@@ -158,12 +184,12 @@ class ScrollHeaderPanel extends HTMLElement {
         opacity: y / headerHeight
       })
     } else {
-      this.applyStyle(titleBar, {
-        position: 'fixed',
-        top: 0,
-        opacity: 1,
-        backgroundColor: this.panelColor
-      })
+      // this.applyStyle(titleBar, {
+      //   position: 'fixed',
+      //   top: 0,
+      //   opacity: 1,
+      //   backgroundColor: this.panelColor
+      // })
     }
 
     const d = Math.min(1, y / headerHeight) * 0.25
@@ -186,10 +212,10 @@ class ScrollHeaderPanel extends HTMLElement {
         opacity: y / headerHeight // 0
       })
     } else {
-      this.applyStyle(titleBar, {
-        position: 'fixed',
-        top: 0
-      })
+      // this.applyStyle(titleBar, {
+      //   position: 'fixed',
+      //   top: 0
+      // })
     }
     this.applyStyle(title, {
       transform: `scale(0.75) translateZ(0px)`

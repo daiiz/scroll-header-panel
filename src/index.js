@@ -50,7 +50,6 @@ class ScrollHeaderPanel extends HTMLElement {
         .header-icon {
           width: 40px;
           height: 40px;
-          margin-top: 12px;
           left: 18px;
           position: absolute;
           background-size: cover;
@@ -59,12 +58,16 @@ class ScrollHeaderPanel extends HTMLElement {
           background-color: rgba(0, 0, 0, 0);
           background-image: url(${this.iconSrcUrl});
         }
+        .menu {
+          position: absolute;
+          right: 10px;
+        }
         .header-menu {
           position: absolute;
           z-index: 20;
           height: 40px;
           margin-top: 12px;
-          right: 10px;
+          width: 100%;
           user-select: none;
           -webkit-user-select: none;
         }
@@ -93,9 +96,7 @@ class ScrollHeaderPanel extends HTMLElement {
           height: ${this.titleHeight}px;
         }
         .t {
-          /* transform: scale(0.75) translateZ(0px); */
           transform-origin: 0;
-          /* margin-top: 8px; */
           padding-top: 10px;
           margin-left: 50px;
           font-family: 'roboto';
@@ -117,9 +118,11 @@ class ScrollHeaderPanel extends HTMLElement {
       <div class='whole'>
         <div class='header'></div>
         <div class='header-color-panel'></div>
-        <div class='header-icon'></div>
         <div class='header-menu'>
-          <slot name='header-menu'></slot>
+          <div class='header-icon'></div>
+          <div class='menu'>
+            <slot name='header-menu'></slot>
+          </div>
         </div>
         <div class='title'>
           <div class='t'>ScrollHeaderPanel</div>
@@ -137,45 +140,67 @@ class ScrollHeaderPanel extends HTMLElement {
     for (const key of keys) dom.style[key] = `${css[key]}`
   }
 
-  directiveSticky ({titleBar, icon, menu}) {
+  directiveSticky ({titleBar, menu}) {
     const y = window.scrollY
     const direction = y > this.lastScrollTop ? 'down' : 'up'
+    const titleHeightCorrection = this.solid ? 0 : this.titleHeight
+    const titlePosition = titleBar.style.position
+    const diffY = y - (+titleBar.style.top.replace('px', ''))
+    const atBodyArea = y > this.headerHeight - titleHeightCorrection
 
-    if (direction === 'down') {
-      this.applyStyle(titleBar, {
-        position: 'absolute'
-      })
-      if (y < this.headerHeight) {
-        const style = {
-          position: 'absolute',
-          top: `${this.solid ? y : Math.min(y, this.headerHeight - this.titleHeight)}px`
+    switch (direction) {
+      case 'down': {
+        const style = {}
+        if (atBodyArea) {
+          if (y > this.headerHeight + this.titleHeight && diffY < this.titleHeight) {
+            // skip
+          } else {
+            if ((titlePosition === 'fixed' && this.lastScrollDirection === 'up')
+              || (y <= this.headerHeight + this.titleHeight)) {
+              style.position = 'absolute'
+              style.top = `${y}px`
+            } else {
+              // XXX: ジャンプする場合はここに来ている可能性大
+              style.position = 'absolute'
+              style.top = `${Math.min(y, this.headerHeight - titleHeightCorrection)}px`
+            }
+          }
+        } else {
+          style.position = 'fixed'
+          style.top = 0
         }
-        this.applyStyle(icon, style)
+        this.applyStyle(titleBar, style)
         this.applyStyle(menu, style)
+        break
       }
-    } else {
-      const style = {}
-      if (this.lastScrollDirection !== 'up') {
-        style.top = `${y - this.titleHeight}px`
-      } else if (y - +titleBar.style.top.replace('px', '') < 0) {
-        style.top = `${y}px`
+      case 'up': {
+        if (atBodyArea) {
+          const style = {}
+          if (this.lastScrollDirection !== 'up') {
+            style.position = 'absolute'
+            style.top = `${y - this.titleHeight}px`
+          } else if (diffY < 0) {
+            style.position = 'fixed'
+            style.top = 0
+          }
+          this.applyStyle(menu, style)
+          this.applyStyle(titleBar, style)
+        } else {
+          this.applyStyle(menu, {position: 'fixed', top: 0})
+        }
+        break
       }
-      this.applyStyle(titleBar, style)
-      this.applyStyle(icon, style)
-      this.applyStyle(menu, style)
     }
-
     this.lastScrollTop = y
     this.lastScrollDirection = direction
   }
 
   onScroll () {
     const titleBar = this.shadowRoot.querySelector('.title')
-    const icon = this.shadowRoot.querySelector('.header-icon')
     const menu = this.shadowRoot.querySelector('.header-menu')
     const headerColorPanel = this.shadowRoot.querySelector('.header-color-panel')
 
-    this.directiveSticky({titleBar, icon, menu})
+    this.directiveSticky({titleBar, menu})
     if (!this.solid) {
       this.behaviorDefault({titleBar, headerColorPanel})
     } else {

@@ -155,8 +155,8 @@ class ScrollHeaderPanel extends HTMLElement {
           if (y > this.headerHeight + this.titleHeight && diffY < this.titleHeight) {
             // skip
           } else {
-            if ((titlePosition === 'fixed' && this.lastScrollDirection === 'up')
-              || (y <= this.headerHeight + this.titleHeight)) {
+            if (titlePosition === 'fixed' && this.lastScrollDirection === 'up') {
+              // || (y <= this.headerHeight + this.titleHeight)) {
               style.position = 'absolute'
               style.top = `${y}px`
             } else {

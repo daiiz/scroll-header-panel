@@ -17,13 +17,13 @@ class ScrollHeaderPanel extends HTMLElement {
 
   attributeChangedCallback () {
     this.solid = this.getAttribute('solid') !== null
-    this.render()
+    this.renderStyle()
   }
 
   get style () {
-    const s = document.createElement('span')
-    s.innerHTML = `
-      <style>
+    const t = document.createElement('template')
+    t.innerHTML = `
+      <style class='style'>
         .whole {
           width: 100%;
           height: 100vh;
@@ -98,15 +98,12 @@ class ScrollHeaderPanel extends HTMLElement {
         }
       </style>
     `
-    return s.innerText
+    return t
   }
 
   get template () {
     const t = document.createElement('template')
     t.innerHTML = `
-      <style>
-        ${this.style}
-      </style>
       <div class='whole'>
         <div class='header'></div>
         <div class='header-color-panel'></div>
@@ -180,9 +177,16 @@ class ScrollHeaderPanel extends HTMLElement {
     }
   }
 
+  renderStyle () {
+    const shadowRoot = this.shadowRoot
+    const oldStyle = shadowRoot.querySelector('.style')
+    if (oldStyle) oldStyle.remove()
+    shadowRoot.appendChild(this.style.content.cloneNode(true))
+  }
+
   render () {
-    const shadowRoot = this.shadowRoot || this.attachShadow({ mode: 'open' })
-    shadowRoot.textContent = null
+    const shadowRoot = this.attachShadow({mode: 'open'})
+    this.renderStyle()
     shadowRoot.appendChild(this.template.content.cloneNode(true))
     window.addEventListener('scroll', this.onScroll.bind(this))
   }

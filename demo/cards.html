@@ -7,7 +7,7 @@
     <meta name='apple-mobile-web-app-capable' content='yes'>
     <title>scroll-header-panel</title>
     <script src='../src/index.js'></script>
-    <script src='../src/griddles-streams.js'></script>
+    <script src='https://daiiz.github.io/griddles2/src/index.js'></script>
     <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
     <link rel='stylesheet' href='./demo.css' />
   </head>
@@ -22,7 +22,7 @@
                 display: block;
                 min-height: 100px;
                 background-color: #fff;
-                margin-bottom: 8px;
+                margin-bottom: 6px;
                 font-size: 10pt;
                 cursor: pointer;
                 -webkit-user-select: none;
@@ -86,8 +86,8 @@
       }
 
       scrollHeaderPanel.addEventListener('scrollend', () => {
-        console.log('scrollend')
         if (griddlesStreams.IsQueueEmpty()) {
+          console.log('scrollend')
           requestAnimationFrame(insertCards)
         } else {
           console.log('skipped')

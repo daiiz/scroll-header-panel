@@ -107,6 +107,12 @@ class ScrollHeaderPanel extends HTMLElement {
           top: ${this.solid ? this.headerHeight + this.titleHeight : this.headerHeight}px;
           background: ${this.bodyColor};
         }
+        .bottom {
+          visibility: hidden;
+          width: 100%;
+          height: 2px;
+          background-color: #555;
+        }
       </style>
     `
     return t
@@ -129,6 +135,7 @@ class ScrollHeaderPanel extends HTMLElement {
         </div>
         <div class='body'>
           <slot name='body'></slot>
+          <div class='bottom'></div>
         </div>
       </div>
     `
@@ -208,6 +215,13 @@ class ScrollHeaderPanel extends HTMLElement {
     }
   }
 
+  onScrollEnd () {
+    if (window.scrollY <= 0) return
+    // XXX: 画面下端での上向きscrollにも反応してしまう
+    const event = new Event('scrollend')
+    this.dispatchEvent(event)
+  }
+
   behaviorDefault ({titleBar, headerColorPanel}) {
     const y = window.scrollY
     const headerHeight = this.headerHeight
@@ -271,6 +285,12 @@ class ScrollHeaderPanel extends HTMLElement {
       const event = new Event('icon-click')
       this.dispatchEvent(event)
     }, false)
+
+    const bottomBar = shadowRoot.querySelector('.bottom')
+    const scrollObserver = new IntersectionObserver(this.onScrollEnd.bind(this), {
+      threshold: 1.0
+    })
+    scrollObserver.observe(bottomBar)
   }
 }
 

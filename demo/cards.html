@@ -54,8 +54,15 @@
     </scroll-header-panel>
 
     <!-- just for demo -->
+    <script>
+      const scrollHeaderPanel = document.querySelector('scroll-header-panel')
+    </script>
     <script src='./icon.js'></script>
     <script>
+      scrollHeaderPanel.addEventListener('scrollend', () => {
+        console.log('scrollend')
+      }, false)
+
       const griddlesStreams = document.querySelector('griddles-streams')
       griddlesStreams.Enqueue(
         {

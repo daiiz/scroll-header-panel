@@ -56,36 +56,45 @@
     <!-- just for demo -->
     <script>
       const scrollHeaderPanel = document.querySelector('scroll-header-panel')
+      const griddlesStreams = document.querySelector('griddles-streams')
     </script>
     <script src='./icon.js'></script>
     <script>
+      const insertCards = () => {
+        griddlesStreams.Enqueue(
+          {
+            card: {type: 'link', value: 'https://www.gyazo.com/'},
+            body: {type: 'text', value: 'Gyoza Gyazo Gyoza Gyazo Gyoza Gyazo!'},
+            photo: {type: 'image', value: 'https://i.gyazo.com/0a9e39f9ecf460ccccb1da1334c26b86.jpg'}
+          },
+          { body: {type: 'text', value: 'aaaaa!'} },
+          {
+            body: {type: 'text', value: 'パンケーキ'},
+            photo: {type: 'image', value: 'https://i.gyazo.com/ddb8f03e5a404862c866d2b95563cd67.jpg'}
+          },
+          { body: {type: 'text', value: 'daiiz'} },
+          { body: {type: 'text', value: 'aaaaa!'} },
+          { body: {type: 'text', value: 'aaaaa!'} },
+          {
+            body: {type: 'text', value: 'いきなり🚀ステーキ'},
+            photo: {type: 'image', value: 'https://i.gyazo.com/1b4314c4f7f532d868b751a9b9816442.jpg'}
+          },
+          { body: {type: 'text', value: 'aaaaa!'} },
+          { body: {type: 'text', value: 'aaaaa!'} },
+          { body: {type: 'text', value: 'aaaaa!'} }
+        )
+      }
+
       scrollHeaderPanel.addEventListener('scrollend', () => {
         console.log('scrollend')
+        if (griddlesStreams.IsQueueEmpty()) {
+          requestAnimationFrame(insertCards)
+        } else {
+          console.log('skipped')
+        }
       }, false)
 
-      const griddlesStreams = document.querySelector('griddles-streams')
-      griddlesStreams.Enqueue(
-        {
-          card: {type: 'link', value: 'https://www.gyazo.com/'},
-          body: {type: 'text', value: 'Gyoza Gyazo Gyoza Gyazo Gyoza Gyazo!'},
-          photo: {type: 'image', value: 'https://i.gyazo.com/0a9e39f9ecf460ccccb1da1334c26b86.jpg'}
-        },
-        { body: {type: 'text', value: 'aaaaa!'} },
-        {
-          body: {type: 'text', value: 'パンケーキ'},
-          photo: {type: 'image', value: 'https://i.gyazo.com/ddb8f03e5a404862c866d2b95563cd67.jpg'}
-        },
-        { body: {type: 'text', value: 'daiiz'} },
-        { body: {type: 'text', value: 'aaaaa!'} },
-        { body: {type: 'text', value: 'aaaaa!'} },
-        {
-          body: {type: 'text', value: 'いきなり🚀ステーキ'},
-          photo: {type: 'image', value: 'https://i.gyazo.com/1b4314c4f7f532d868b751a9b9816442.jpg'}
-        },
-        { body: {type: 'text', value: 'aaaaa!'} },
-        { body: {type: 'text', value: 'aaaaa!'} },
-        { body: {type: 'text', value: 'aaaaa!'} }
-      )
+      insertCards()
     </script>
   </body>
 </html>

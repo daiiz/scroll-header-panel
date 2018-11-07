@@ -288,7 +288,7 @@ class ScrollHeaderPanel extends HTMLElement {
 
     const bottomBar = shadowRoot.querySelector('.bottom')
     const scrollObserver = new IntersectionObserver(this.onScrollEnd.bind(this), {
-      threshold: 1.0
+      threshold: 0.5
     })
     scrollObserver.observe(bottomBar)
   }

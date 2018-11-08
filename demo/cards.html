@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset='utf-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+    <meta name='mobile-web-app-capable' content='yes'>
+    <meta name='apple-mobile-web-app-capable' content='yes'>
+    <title>scroll-header-panel</title>
+    <script src='../src/index.js'></script>
+    <script src='https://daiiz.github.io/griddles2/src/index.js'></script>
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+    <link rel='stylesheet' href='./demo.css' />
+  </head>
+  <body>
+    <scroll-header-panel>
+      <div slot='header-menu' style='color: #fff;'>menu...</div>
+      <div class='body' slot='body'>
+        <griddles-streams col=2 gutter=2 width=350>
+          <template slot='card-style'>
+            <style>
+              .card {
+                display: block;
+                min-height: 100px;
+                background-color: #fff;
+                margin-bottom: 6px;
+                font-size: 10pt;
+                cursor: pointer;
+                -webkit-user-select: none;
+                text-decoration: none;
+                color: #111;
+                border-radius: 2px;
+                box-shadow: 0 2px 0 0 #ddd;
+              }
+              .photo {
+                display: block;
+                border-radius: 2px 2px 0 0;
+                width: 100%;
+              }
+              .body {
+                padding: 5px 6px;
+              }
+            </style>
+          </template>
+          <template slot='card'>
+            <div>
+              <a target='_blank' class='card'>
+                <img class='photo' />
+                <div class='body'></div>
+              </a>
+            </div>
+          </template>
+        </griddles-streams>
+      </div>
+    </scroll-header-panel>
+
+    <!-- just for demo -->
+    <script>
+      const scrollHeaderPanel = document.querySelector('scroll-header-panel')
+      const griddlesStreams = document.querySelector('griddles-streams')
+    </script>
+    <script src='./icon.js'></script>
+    <script>
+      const insertCards = () => {
+        griddlesStreams.Enqueue(
+          {
+            card: {type: 'link', value: 'https://www.gyazo.com/'},
+            body: {type: 'text', value: 'Gyoza Gyazo Gyoza Gyazo Gyoza Gyazo!'},
+            photo: {type: 'image', value: 'https://i.gyazo.com/0a9e39f9ecf460ccccb1da1334c26b86.jpg'}
+          },
+          { body: {type: 'text', value: 'aaaaa!'} },
+          {
+            body: {type: 'text', value: 'パンケーキ'},
+            photo: {type: 'image', value: 'https://i.gyazo.com/ddb8f03e5a404862c866d2b95563cd67.jpg'}
+          },
+          { body: {type: 'text', value: 'daiiz'} },
+          { body: {type: 'text', value: 'aaaaa!'} },
+          { body: {type: 'text', value: 'aaaaa!'} },
+          {
+            body: {type: 'text', value: 'いきなり🚀ステーキ'},
+            photo: {type: 'image', value: 'https://i.gyazo.com/1b4314c4f7f532d868b751a9b9816442.jpg'}
+          },
+          { body: {type: 'text', value: 'aaaaa!'} },
+          { body: {type: 'text', value: 'aaaaa!'} },
+          { body: {type: 'text', value: 'aaaaa!'} }
+        )
+      }
+
+      scrollHeaderPanel.addEventListener('scrollend', () => {
+        if (griddlesStreams.IsQueueEmpty()) {
+          console.log('scrollend')
+          requestAnimationFrame(insertCards)
+        } else {
+          console.log('skipped')
+        }
+      }, false)
+
+      insertCards()
+    </script>
+  </body>
+</html>
